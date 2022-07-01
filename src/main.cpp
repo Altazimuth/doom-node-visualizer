@@ -97,6 +97,8 @@ int main(int argc, char** argv) {
 	View view = calculateView(mapLoad.map, drawContext, renderState.selectedNode);
 	bool mouseClick;
 	bool escapePressed;
+	bool pagedownPressed;
+	bool pageupPressed;
 
 	while (isRunning) {
 		lastTime = frameStart;
@@ -106,6 +108,8 @@ int main(int argc, char** argv) {
 
 		mouseClick = false;
 		escapePressed = false;
+		pagedownPressed = false;
+		pageupPressed = false;
 
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -115,6 +119,12 @@ int main(int argc, char** argv) {
 				case SDL_KEYDOWN: {
 					if (event.key.keysym.sym == SDLK_ESCAPE) {
 						escapePressed = true;
+					}
+					else if (event.key.keysym.sym == SDLK_PAGEDOWN) {
+						pagedownPressed = true;
+					}
+					else if (event.key.keysym.sym == SDLK_PAGEUP) {
+						pageupPressed = true;
 					}
 				} break;
 				case SDL_MOUSEBUTTONDOWN: {
@@ -154,7 +164,37 @@ int main(int argc, char** argv) {
 				}
 			}
 			else if (escapePressed) {
-				renderState.selectedNode = mapLoad.map->nodes.length - 1;
+				renderState.selectedNode = map->nodes.length - 1;
+				view = calculateView(map, drawContext, renderState.selectedNode);
+
+				f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
+				f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
+
+				renderState.highlightedSide = pointOnLineSide(worldx, worldy, map->nodes[renderState.selectedNode]);
+			}
+			else if (pagedownPressed) {
+				mapIndex = (mapIndex + 1) % mapLumps.length;
+				MapLoad mapLoad = loadMap(mapLumps[mapIndex]);
+
+				if (mapLoad.result != MapResult::Success) continue;
+
+				map = mapLoad.map;
+				renderState.selectedNode = map->nodes.length - 1;
+				view = calculateView(map, drawContext, renderState.selectedNode);
+
+				f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
+				f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
+
+				renderState.highlightedSide = pointOnLineSide(worldx, worldy, map->nodes[renderState.selectedNode]);
+			}
+			else if (pageupPressed) {
+				mapIndex = mapIndex == 0 ? mapLumps.length - 1 : mapIndex - 1;
+				MapLoad mapLoad = loadMap(mapLumps[mapIndex]);
+
+				if (mapLoad.result != MapResult::Success) continue;
+
+				map = mapLoad.map;
+				renderState.selectedNode = map->nodes.length - 1;
 				view = calculateView(map, drawContext, renderState.selectedNode);
 
 				f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
