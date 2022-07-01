@@ -223,7 +223,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 
 			LineDef* line = map->lines.data + s->linedef;
 
-			s->fronsector = map->sides[line->sidenum[s->side]].sector;
+			s->frontsector = map->sides[line->sidenum[s->side]].sector;
 			if (line->flags & (i32)LineFlags::TwoSided && line->sidenum[s->side ^ 1] != -1) {
 				s->backsector = map->sides[line->sidenum[s->side ^ 1]].sector;
 			}
@@ -255,7 +255,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 			ssec->numsegs = mssec->numSegs;
 
 			Seg* seg = map->segs.data + ssec->firstseg;
-			ssec->sector = seg->fronsector;
+			ssec->sector = seg->frontsector;
 		}
 
 		logMessage("\tLoaded %i subsectors", ssecLookup.lump.length);

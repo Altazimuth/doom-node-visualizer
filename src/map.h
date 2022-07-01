@@ -48,7 +48,7 @@ struct Seg {
 	i16 v1, v2;
 	f32 length, xoffset;
 	i16 linedef, side;
-	i16 fronsector, backsector;
+	i16 frontsector, backsector;
 };
 
 struct SubSector {
