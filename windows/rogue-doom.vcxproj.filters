@@ -60,5 +60,6 @@
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include=".gitignore" />
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
