@@ -130,14 +130,20 @@ static void drawWorldBox(View &view, DrawContext &context, const f32 bbox[4], Co
 }
 
 
-static Color NormalLine = { 79, 79, 79 };
+static Color DimLine = { 79, 79, 79 };
+static Color LightLine = { 128, 128, 128 };
 static Color SplitLine = { 119, 255, 111 };
 static Color SplitRay = { 32, 68, 24 };
 static Color LightBox = { 0, 0, 203 };
 static Color DimBox = { 0, 0, 83 };
 
+static Color AutoMapOneSided = { 191, 1, 1 };
+static Color AutoMapDoor = { 255, 255, 1 };
+static Color AutoMapLedge = { 135, 38, 8 };
+static Color AutoMapUnmarked = { 131, 131, 131 };
 
-static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subsector) {
+
+static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subsector, bool highlighted) {
 	auto ss = map->subsectors[subsector];
 
 	for (i16 i = 0; i < ss.numsegs; ++i) {
@@ -146,41 +152,51 @@ static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subs
 		auto v1 = map->vertexes[seg.v1];
 		auto v2 = map->vertexes[seg.v2];
 
-		drawWorldLine(view, context, v1.x, v1.y, v2.x, v2.y, NormalLine);
+		Color lineColor;
+
+		if (highlighted) {
+			if (seg.backsector == -1)
+				lineColor = AutoMapOneSided;
+			else {
+				auto frontsector = map->sectors.data + seg.frontsector;
+				auto backsector = map->sectors.data + seg.backsector;
+
+				if (frontsector->floorheight != backsector->floorheight)
+					lineColor = AutoMapLedge;
+				else if (frontsector->ceilingheight != backsector->ceilingheight)
+					lineColor = AutoMapDoor;
+				else
+					lineColor = AutoMapUnmarked;
+			}
+		}
+		else {
+			lineColor = DimLine;
+		}
+		drawWorldLine(view, context, v1.x, v1.y, v2.x, v2.y, lineColor);
 	}
 }
 
-static void renderBspNode(Map* map, View &view, DrawContext &context, i32 nodeNum, RenderState& state) {
+static void renderBspNode(Map* map, View &view, DrawContext &context, i32 nodeNum, RenderState& state, bool highlighted = false) {
 	i32 cursor = nodeNum;
-	const Node* splitNode = 0;
 
 	while(!(cursor & SubsectorChildFlag)) {
 		const Node& node = map->nodes[cursor];
 
-		if (cursor == state.selectedNode) {
-			drawWorldBox(view, context, node.bbox[state.highlightedSide ^ 1], DimBox);
+		bool callHighlighted = highlighted;
 
-			f32 xextent = node.dx * 128;
-			f32 yextent = node.dy * 128;
-			drawWorldLine(view, context, node.x - xextent, node.y - yextent, node.x + xextent * 2, node.y + yextent * 2, SplitRay);
-
-			splitNode = &node;
+		if (state.selectedNode == cursor) {
+			callHighlighted = state.highlightedSide == 0;
+			highlighted = state.highlightedSide == 1;
 		}
 
 		i32 side = 0;
-		renderBspNode(map, view, context, node.children[side], state);
+		renderBspNode(map, view, context, node.children[side], state, callHighlighted);
 
 		side ^= 1;
 		cursor = node.children[side];
 	}
 
-	renderSubSector(view, context, map, cursor & ~SubsectorChildFlag);
-
-	if (splitNode != 0) {
-		drawWorldBox(view, context, splitNode->bbox[state.highlightedSide], LightBox);
-
-		drawWorldLine(view, context, splitNode->x, splitNode->y, splitNode->x + splitNode->dx, splitNode->y + splitNode->dy, SplitLine);
-	}
+	renderSubSector(view, context, map, cursor & ~SubsectorChildFlag, highlighted);
 }
 
 
@@ -234,5 +250,23 @@ void clearScreen(DrawContext& drawContext) {
 void renderMap(Map* map, View& view, DrawContext& drawContext, RenderState& state) {
 	clearScreen(drawContext);
 
+	Node* selectedNode = 0;
+
+	if (!(state.selectedNode & SubsectorChildFlag)) selectedNode = map->nodes.data + state.selectedNode;
+
+
+	if (selectedNode) {
+		drawWorldBox(view, drawContext, selectedNode->bbox[state.highlightedSide ^ 1], DimBox);
+		drawWorldBox(view, drawContext, selectedNode->bbox[state.highlightedSide], LightBox);
+	}
+
 	renderBspNode(map, view, drawContext, (i32)map->nodes.length - 1, state);
+
+	if (selectedNode) {
+		f32 xextent = selectedNode->dx * 128;
+		f32 yextent = selectedNode->dy * 128;
+		drawWorldLine(view, drawContext, selectedNode->x - xextent, selectedNode->y - yextent, selectedNode->x + xextent * 2, selectedNode->y + yextent * 2, SplitRay);
+
+		drawWorldLine(view, drawContext, selectedNode->x, selectedNode->y, selectedNode->x + selectedNode->dx, selectedNode->y + selectedNode->dy, SplitLine);
+	}
 }
