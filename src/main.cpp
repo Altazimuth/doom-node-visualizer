@@ -20,6 +20,10 @@ static Slice<char> titleBuffer = {};
 
 
 int main(int argc, char** argv) {
+	if (argc == 1) {
+		logMessage("Usage: drag wad file on to exe or run from command line with the first argument being the path to the wad you'd like to inspect nodes from");
+		return 1;
+	}
 
 	logMessage("Initializing memory");
 	initMemory();
@@ -72,12 +76,9 @@ int main(int argc, char** argv) {
 	u64 frameStart = SDL_GetPerformanceCounter(), lastTime;
 	u64 counterFreq = SDL_GetPerformanceFrequency();
 
-	// @TODO: Load wad file from argv
-	const i8* wadFilePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Doom 2\\base\\DOOM2.WAD";
+	logMessage("Loading wad file %s...", argv[1]);
 
-	logMessage("Loading wad file %s...", wadFilePath);
-
-	WadResult wadResult = loadWadFile(wadFilePath);
+	WadResult wadResult = loadWadFile(argv[1]);
 	if (wadResult == WadResult::Failure) {
 		fatalError("Failed to load wad");
 	}
@@ -85,6 +86,9 @@ int main(int argc, char** argv) {
 	Array<LumpNum> mapLumps = findMapLumps();
 	if (mapLumps.length == 0) {
 		fatalError("Wad contains no map lumps");
+	}
+	else {
+		logMessage("Wad contains %i map lumps", mapLumps.length);
 	}
 
 	i32 mapIndex = 0;
