@@ -1,5 +1,7 @@
 # Doom Node Visualizer
 
+![image](https://user-images.githubusercontent.com/554740/176973155-5e56e6d4-00d0-4aaf-83b4-bc79c52d05af.png)
+
 This is a simple application which can load wad files made for DooM and display the BSP information and allow a user to navigate down the BSP tree.
 
 ## Building
