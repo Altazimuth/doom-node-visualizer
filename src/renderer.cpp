@@ -115,7 +115,7 @@ static void drawWorldLine(View &view, DrawContext &context, f32 fx1, f32 fy1, f3
 }
 
 
-static void drawWorldBox(View &view, DrawContext &context, f32 bbox[4], Color color) {
+static void drawWorldBox(View &view, DrawContext &context, const f32 bbox[4], Color color) {
 	f32 fx1, fy1, fx2, fy2;
 
 	fx1 = bbox[BoxLeft];
@@ -152,18 +152,20 @@ static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subs
 
 static void renderBspNode(Map* map, View &view, DrawContext &context, i32 nodeNum, RenderState& state) {
 	i32 cursor = nodeNum;
-	auto splitNode = map->nodes[nodeNum];
-
-	if (nodeNum == state.selectedNode) {
-		drawWorldBox(view, context, splitNode.bbox[state.highlightedSide ^ 1], DimBox);
-
-		f32 xextent = splitNode.dx * 128;
-		f32 yextent = splitNode.dy * 128;
-		drawWorldLine(view, context, splitNode.x - xextent, splitNode.y - yextent, splitNode.x + xextent * 2, splitNode.y + yextent * 2, SplitRay);
-	}
+	const Node* splitNode = 0;
 
 	while(!(cursor & SubsectorChildFlag)) {
 		const Node& node = map->nodes[cursor];
+
+		if (cursor == state.selectedNode) {
+			drawWorldBox(view, context, node.bbox[state.highlightedSide ^ 1], DimBox);
+
+			f32 xextent = node.dx * 128;
+			f32 yextent = node.dy * 128;
+			drawWorldLine(view, context, node.x - xextent, node.y - yextent, node.x + xextent * 2, node.y + yextent * 2, SplitRay);
+
+			splitNode = &node;
+		}
 
 		i32 side = 0;
 		renderBspNode(map, view, context, node.children[side], state);
@@ -174,10 +176,10 @@ static void renderBspNode(Map* map, View &view, DrawContext &context, i32 nodeNu
 
 	renderSubSector(view, context, map, cursor & ~SubsectorChildFlag);
 
-	if (nodeNum == state.selectedNode) {
-		drawWorldBox(view, context, splitNode.bbox[state.highlightedSide], LightBox);
+	if (splitNode != 0) {
+		drawWorldBox(view, context, splitNode->bbox[state.highlightedSide], LightBox);
 
-		drawWorldLine(view, context, splitNode.x, splitNode.y, splitNode.x + splitNode.dx, splitNode.y + splitNode.dy, SplitLine);
+		drawWorldLine(view, context, splitNode->x, splitNode->y, splitNode->x + splitNode->dx, splitNode->y + splitNode->dy, SplitLine);
 	}
 }
 
@@ -214,7 +216,7 @@ View calculateView(Map* map, DrawContext& drawContext, i32 nodeNum) {
 }
 
 
-void renderMap(Map* map, View& view, DrawContext& drawContext, RenderState& state) {
+void clearScreen(DrawContext& drawContext) {
 	u32  src = ((0 << drawContext.rshift) & drawContext.rmask) |
 		((0 << drawContext.gshift) & drawContext.gmask) |
 		((0 << drawContext.bshift) & drawContext.bmask);
@@ -227,6 +229,10 @@ void renderMap(Map* map, View& view, DrawContext& drawContext, RenderState& stat
 			dest++;
 		}
 	}
+}
+
+void renderMap(Map* map, View& view, DrawContext& drawContext, RenderState& state) {
+	clearScreen(drawContext);
 
 	renderBspNode(map, view, drawContext, (i32)map->nodes.length - 1, state);
 }

@@ -10,7 +10,7 @@ struct View {
 };
 
 struct RenderState {
-	i32 selectedNode;
+	i16 selectedNode;
 	i32 highlightedSide;
 };
 

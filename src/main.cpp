@@ -95,12 +95,15 @@ int main(int argc, char** argv) {
 		0
 	};
 	View view = calculateView(mapLoad.map, drawContext, renderState.selectedNode);
+	bool mouseClick;
 
 	while (isRunning) {
 		lastTime = frameStart;
 		frameStart = SDL_GetPerformanceCounter();
 
 		f32 secondsElapsed = (f32)(frameStart - lastTime) / (f32)counterFreq;
+
+		mouseClick = false;
 
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -112,6 +115,11 @@ int main(int argc, char** argv) {
 						isRunning = false;
 					}
 				} break;
+				case SDL_MOUSEBUTTONDOWN: {
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						mouseClick = true;
+					}
+				} break;
 			}
 		}
 
@@ -120,15 +128,32 @@ int main(int argc, char** argv) {
 		}
 
 		if (mapLoad.result == MapResult::Success) {
+			auto map = mapLoad.map;
+
 			i32 x, y;
 			SDL_GetMouseState(&x, &y);
 
+			// @BUG: This doesn't work right when zoomed in.
 			f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
 			f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
 
 			renderState.highlightedSide = pointOnLineSide(worldx, worldy, mapLoad.map->nodes[renderState.selectedNode]);
 
-			renderMap(mapLoad.map, view, drawContext, renderState);
+			if (mouseClick) {
+				i16 newNode = map->nodes[renderState.selectedNode].children[renderState.highlightedSide];
+
+				if (!(newNode & SubsectorChildFlag)) {
+					renderState.selectedNode = newNode;
+					view = calculateView(map, drawContext, renderState.selectedNode);
+
+					f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
+					f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
+
+					renderState.highlightedSide = pointOnLineSide(worldx, worldy, map->nodes[renderState.selectedNode]);
+				}
+			}
+
+			renderMap(map, view, drawContext, renderState);
 		}
 		else {
 			// Show error to user?

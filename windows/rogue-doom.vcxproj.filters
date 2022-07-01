@@ -61,7 +61,4 @@
     <None Include="..\.gitignore" />
     <None Include=".gitignore" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\TODO.txt" />
-  </ItemGroup>
 </Project>
