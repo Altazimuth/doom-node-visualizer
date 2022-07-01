@@ -133,8 +133,7 @@ int main(int argc, char** argv) {
 			i32 x, y;
 			SDL_GetMouseState(&x, &y);
 
-			// @BUG: This doesn't work right when zoomed in.
-			f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
+			f32 worldx = (x - drawContext.xcenter + view.offset.x) / view.zoom;
 			f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
 
 			renderState.highlightedSide = pointOnLineSide(worldx, worldy, mapLoad.map->nodes[renderState.selectedNode]);
@@ -154,6 +153,9 @@ int main(int argc, char** argv) {
 			}
 
 			renderMap(map, view, drawContext, renderState);
+
+			drawWorldLine(view, drawContext, worldx - 5, worldy - 5, worldx + 5, worldy + 5, Color{ 255, 255, 255 });
+			drawWorldLine(view, drawContext, worldx - 5, worldy + 5, worldx + 5, worldy - 5, Color{ 255, 255, 255 });
 		}
 		else {
 			// Show error to user?

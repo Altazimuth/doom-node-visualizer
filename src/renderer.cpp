@@ -19,7 +19,7 @@ i32 pointOnLineSide(f32 testx, f32 testy, f32 linex, f32 liney, f32 dx, f32 dy) 
 }
 
 
-static void drawLine(DrawContext &context, i32 x1, i32 y1, i32 x2, i32 y2, Color color) {
+void drawLine(DrawContext &context, i32 x1, i32 y1, i32 x2, i32 y2, Color color) {
 	i32 dx = x2 - x1;
 	i32 dy = y2 - y1;
 
@@ -101,7 +101,7 @@ static void drawLine(DrawContext &context, i32 x1, i32 y1, i32 x2, i32 y2, Color
 }
 
 
-static void drawWorldLine(View &view, DrawContext &context, f32 fx1, f32 fy1, f32 fx2, f32 fy2, Color color) {
+void drawWorldLine(View &view, DrawContext &context, f32 fx1, f32 fy1, f32 fx2, f32 fy2, Color color) {
 	f32 x_offset = context.xcenter - view.offset.x;
 	f32 y_offset = context.ycenter + view.offset.y;
 
