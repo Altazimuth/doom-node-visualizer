@@ -96,6 +96,7 @@ int main(int argc, char** argv) {
 	};
 	View view = calculateView(mapLoad.map, drawContext, renderState.selectedNode);
 	bool mouseClick;
+	bool escapePressed;
 
 	while (isRunning) {
 		lastTime = frameStart;
@@ -104,6 +105,7 @@ int main(int argc, char** argv) {
 		f32 secondsElapsed = (f32)(frameStart - lastTime) / (f32)counterFreq;
 
 		mouseClick = false;
+		escapePressed = false;
 
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -112,7 +114,7 @@ int main(int argc, char** argv) {
 				} break;
 				case SDL_KEYDOWN: {
 					if (event.key.keysym.sym == SDLK_ESCAPE) {
-						isRunning = false;
+						escapePressed = true;
 					}
 				} break;
 				case SDL_MOUSEBUTTONDOWN: {
@@ -151,11 +153,17 @@ int main(int argc, char** argv) {
 					renderState.highlightedSide = pointOnLineSide(worldx, worldy, map->nodes[renderState.selectedNode]);
 				}
 			}
+			else if (escapePressed) {
+				renderState.selectedNode = mapLoad.map->nodes.length - 1;
+				view = calculateView(map, drawContext, renderState.selectedNode);
+
+				f32 worldx = (x - drawContext.xcenter - view.offset.x) / view.zoom;
+				f32 worldy = (drawContext.ycenter - y + view.offset.y) / view.zoom;
+
+				renderState.highlightedSide = pointOnLineSide(worldx, worldy, map->nodes[renderState.selectedNode]);
+			}
 
 			renderMap(map, view, drawContext, renderState);
-
-			drawWorldLine(view, drawContext, worldx - 5, worldy - 5, worldx + 5, worldy + 5, Color{ 255, 255, 255 });
-			drawWorldLine(view, drawContext, worldx - 5, worldy + 5, worldx + 5, worldy - 5, Color{ 255, 255, 255 });
 		}
 		else {
 			// Show error to user?
