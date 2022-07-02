@@ -28,6 +28,6 @@ When viewing a map, the root split will start out displayed as a green line. Mov
 
 ### Keyboard shortcuts
 
-Escape - Return to the root node of the map
-PgDown - Cycle to the next map in the wad
-PgUp   - Cycle to the previous map in the wad
+- Escape: Return to the root node of the map
+- PgDown: Cycle to the next map in the wad
+- PgUp: Cycle to the previous map in the wad
