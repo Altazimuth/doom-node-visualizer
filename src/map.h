@@ -21,16 +21,16 @@ struct Vertex {
 };
 
 struct SideDef {
-	i16 xoffset, yoffset;
+	f32 xoffset, yoffset;
 	i16 topTexture, bottomTexture, midTexture;
-	i16 sector;
+	Sector *sector;
 };
 
 struct LineDef {
-	i16 v1, v2;
+	Vertex *v1, *v2;
 	i16 flags;
 	i16 special, tag;
-	i16 sidenum[2];
+	i32 sidenum[2];
 };
 enum class LineFlags {
 	Blocking = 0x1,
@@ -45,15 +45,16 @@ enum class LineFlags {
 };
 
 struct Seg {
-	i16 v1, v2;
+	Vertex *v1, *v2;
 	f32 length, xoffset;
-	i16 linedef, side;
-	i16 frontsector, backsector;
+	LineDef *linedef;
+	SideDef *side;
+	Sector *frontsector, *backsector;
 };
 
 struct SubSector {
-	i16 sector;
-	i16 firstseg, numsegs;
+	Sector *sector;
+	i32 firstseg, numsegs;
 };
 
 const i32 BoxTop = 0;
@@ -61,11 +62,11 @@ const i32 BoxBottom = 1;
 const i32 BoxLeft = 2;
 const i32 BoxRight = 3;
 
-const i16 SubsectorChildFlag = 0x8000;
+const i32 SubsectorChildFlag = 0x80000000;
 struct Node {
 	f32 x, y, dx, dy;
 	f32 bbox[2][4];
-	i16 children[2];
+	i32 children[2];
 };
 
 struct Map {

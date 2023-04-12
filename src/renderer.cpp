@@ -143,23 +143,23 @@ static Color AutoMapLedge = { 135, 38, 8 };
 static Color AutoMapUnmarked = { 131, 131, 131 };
 
 
-static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subsector, bool highlighted) {
+static void renderSubSector(View &view, DrawContext &context, Map *map, i32 subsector, bool highlighted) {
 	auto ss = map->subsectors[subsector];
 
-	for (i16 i = 0; i < ss.numsegs; ++i) {
+	for (i32 i = 0; i < ss.numsegs; ++i) {
 		auto seg = map->segs[i + ss.firstseg];
 
-		auto v1 = map->vertexes[seg.v1];
-		auto v2 = map->vertexes[seg.v2];
+		auto v1 = seg.v1;
+		auto v2 = seg.v2;
 
 		Color lineColor;
 
 		if (highlighted) {
-			if (seg.backsector == -1)
+			if (seg.backsector == nullptr)
 				lineColor = AutoMapOneSided;
 			else {
-				auto frontsector = map->sectors.data + seg.frontsector;
-				auto backsector = map->sectors.data + seg.backsector;
+				auto frontsector = seg.frontsector;
+				auto backsector = seg.backsector;
 
 				if (frontsector->floorheight != backsector->floorheight)
 					lineColor = AutoMapLedge;
@@ -172,7 +172,7 @@ static void renderSubSector(View &view, DrawContext &context, Map *map, i16 subs
 		else {
 			lineColor = DimLine;
 		}
-		drawWorldLine(view, context, v1.x, v1.y, v2.x, v2.y, lineColor);
+		drawWorldLine(view, context, v1->x, v1->y, v2->x, v2->y, lineColor);
 	}
 }
 
@@ -214,11 +214,11 @@ View calculateView(Map* map, DrawContext& drawContext, i32 nodeNum) {
 
 	f32 bufferFactor = 1.02;
 
-	v1.x = min(node->bbox[0][BoxLeft], node->bbox[1][BoxLeft]);
-	v1.y = min(node->bbox[0][BoxBottom], node->bbox[1][BoxBottom]);
+	v1.x = fminf(node->bbox[0][BoxLeft], node->bbox[1][BoxLeft]);
+	v1.y = fminf(node->bbox[0][BoxBottom], node->bbox[1][BoxBottom]);
 
-	v2.x = max(node->bbox[0][BoxRight], node->bbox[1][BoxRight]);
-	v2.y = max(node->bbox[0][BoxTop], node->bbox[1][BoxTop]);
+	v2.x = fmaxf(node->bbox[0][BoxRight], node->bbox[1][BoxRight]);
+	v2.y = fmaxf(node->bbox[0][BoxTop], node->bbox[1][BoxTop]);
 
 	result.offset = v1 + ((v2 - v1) / 2.0f);
 	result.zoom = fminf(

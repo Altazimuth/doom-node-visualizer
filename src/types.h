@@ -18,6 +18,7 @@ const i32 fixedUnit = 1 << fracBits;
 
 typedef float  f32;
 typedef double f64;
+const f64 fpFracUnit = 65536.0;
 
 typedef i32 LumpNum;
 

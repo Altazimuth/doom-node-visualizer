@@ -16,7 +16,7 @@ struct MemoryArena {
 };
 
 
-const usize MAIN_BLOCK_SIZE = MEGABYTES(128);
+const usize MAIN_BLOCK_SIZE = MEGABYTES(512);
 static MemoryBook mainMemoryBlock = {};
 
 static MemoryArena permanentStorage = {};
@@ -43,12 +43,12 @@ void initMemory() {
 	usize offset = 0;
 
 	permanentStorage.data = permanentStorage.freePtr = block + offset;
-	permanentStorage.size = MEGABYTES(32);
+	permanentStorage.size = MEGABYTES(128);
 
 	offset += permanentStorage.size;
 
 	levelStorage.data = levelStorage.freePtr = block + offset;
-	levelStorage.size = MEGABYTES(32);
+	levelStorage.size = MEGABYTES(128);
 
 	offset += levelStorage.size;
 

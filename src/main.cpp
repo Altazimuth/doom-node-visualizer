@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 		logMessage("Wad contains %i map lumps", mapLumps.length);
 	}
 
-	i32 mapIndex = 0;
+	usize mapIndex = 0;
 	MapLoad mapLoad = loadMap(mapLumps[mapIndex]);
 
 	RenderState renderState = {
@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
 			renderState.highlightedSide = pointOnLineSide(worldx, worldy, mapLoad.map->nodes[renderState.selectedNode]);
 
 			if (mouseClick) {
-				i16 newNode = map->nodes[renderState.selectedNode].children[renderState.highlightedSide];
+				i32 newNode = map->nodes[renderState.selectedNode].children[renderState.highlightedSide];
 
 				if (!(newNode & SubsectorChildFlag)) {
 					renderState.selectedNode = newNode;
