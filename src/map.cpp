@@ -159,7 +159,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 			}
 		}
 
-		logMessage("\tLoaded %i segs", segsLookup.lump.length);
+		logMessage("\tLoaded %i segs", map->segs.length);
 	}
 
 	// Subsectors
@@ -185,7 +185,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 			ssec->sector = seg->frontsector;
 		}
 
-		logMessage("\tLoaded %i subsectors", ssecLookup.lump.length);
+		logMessage("\tLoaded %i subsectors", map->subsectors.length);
 	}
 
 	// Nodes
@@ -218,7 +218,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 			}
 		}
 
-		logMessage("\tLoaded %i nodes", nodesLookup.lump.length);
+		logMessage("\tLoaded %i nodes", map->nodes.length);
 	}
 
 	return true;
@@ -599,7 +599,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 			sec->tag = mapsec->tag;
 		}
 
-		logMessage("\tLoaded %i sectors", sectors.lump.length);
+		logMessage("\tLoaded %i sectors", map->sectors.length);
 	}
 
 	// Vertexes
@@ -622,7 +622,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 			v->y = mv->y;
 		}
 
-		logMessage("\tLoaded %i vertexes", vertexesLookup.lump.length);
+		logMessage("\tLoaded %i vertexes", map->vertexes.length);
 	}
 
 	// Sides
@@ -650,7 +650,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 			side->midTexture = -1;
 		}
 
-		logMessage("\tLoaded %i sides", sidesLookup.lump.length);
+		logMessage("\tLoaded %i sides", map->sides.length);
 	}
 
 	// Lines
@@ -678,7 +678,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 			l->sidenum[1] = i16ToI32(ml->sidenum[1]);
 		}
 
-		logMessage("\tLoaded %i lines", linesLookup.lump.length);
+		logMessage("\tLoaded %i lines", map->lines.length);
 	}
 
 	auto nodesLookup = getLumpByNum(lumpNum, (int)MapLumps::Nodes);
