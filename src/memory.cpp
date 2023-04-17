@@ -43,7 +43,7 @@ void initMemory() {
 	usize offset = 0;
 
 	permanentStorage.data = permanentStorage.freePtr = block + offset;
-	permanentStorage.size = MEGABYTES(128);
+	permanentStorage.size = MEGABYTES(256);
 
 	offset += permanentStorage.size;
 
@@ -70,7 +70,7 @@ void resetArena(MemoryArena *arena) {
 }
 
 
-u8* memoryAlloc(MemoryArena *arena, usize size) {
+u8* rawArenaAlloc(MemoryArena *arena, usize size) {
 	if (!arena || (arena->freePtr - arena->data) + size >= arena->size) {
 		fatalError("Failed to allocate from arena");
 	}

@@ -16,7 +16,12 @@ extern MemoryArena *permanent;
 extern MemoryArena *level;
 extern MemoryArena *temporary;
 
-u8* memoryAlloc(MemoryArena *arena, usize size);
-void resetArena(MemoryArena *arena);
+u8* rawArenaAlloc(MemoryArena* arena, usize size);
+void resetArena(MemoryArena* arena);
+
+template<typename T>
+T* arenaAlloc(MemoryArena* arena, usize capacity = 1) {
+	return (T*)rawArenaAlloc(arena, sizeof(T) * capacity);
+}
 
 void reportMemoryStats();

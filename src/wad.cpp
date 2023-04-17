@@ -32,9 +32,8 @@ static usize     maxWads = 0;
 
 void initWads() {
 	maxWads = 127;
-	u8* memory = memoryAlloc(permanent, sizeof(WadFile) * maxWads);
+	wadFiles = arenaAlloc<WadFile>(permanent, maxWads);
 
-	wadFiles = (WadFile *)memory;
 	numLoadedWads = 0;
 }
 
@@ -51,7 +50,7 @@ WadResult loadWadFile(const char *name) {
 		fseek(f, 0, SEEK_SET);
 
 		if(size) {
-			auto mem = memoryAlloc(permanent, size);
+			auto mem = arenaAlloc<u8>(permanent, size);
 
 			fread(mem, 1, size, f);
 
@@ -153,7 +152,7 @@ Array<LumpNum> findMapLumps() {
 	Array<LumpNum> result;
 
 	result.capacity = 50;
-	result.data = (LumpNum*)memoryAlloc(permanent, sizeof(LumpNum) * result.capacity);
+	result.data = arenaAlloc<LumpNum>(permanent, result.capacity);
 	result.length = 0;
 
 	for (i32 i = 0; i < numLoadedWads; ++i) {

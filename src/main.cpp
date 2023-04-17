@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 		fatalError("Failed to open window");
 	}
 
-	titleBuffer.data = (char*)memoryAlloc(permanent, sizeof(char) * 1024);
+	titleBuffer.data = arenaAlloc<char>(permanent, 1024);
 	titleBuffer.length = 1024;
 
 	bool isRunning = true;

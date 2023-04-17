@@ -119,7 +119,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 		mapSegs.data = (MapSeg*)segsLookup.lump.data;
 		mapSegs.length = segsLookup.lump.length / sizeof(MapSeg);
 
-		map->segs.data = (Seg*)memoryAlloc(level, sizeof(Seg) * mapSegs.length);
+		map->segs.data = arenaAlloc<Seg>(level, mapSegs.length);
 		map->segs.length = mapSegs.length;
 
 		for (int i = 0; i < mapSegs.length; ++i) {
@@ -171,7 +171,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 		mapSubSectors.data = (MapSubsector*)ssecLookup.lump.data;
 		mapSubSectors.length = ssecLookup.lump.length / sizeof(MapSubsector);
 
-		map->subsectors.data = (SubSector*)memoryAlloc(level, sizeof(SubSector) * mapSubSectors.length);
+		map->subsectors.data = arenaAlloc<SubSector>(level, mapSubSectors.length);
 		map->subsectors.length = mapSubSectors.length;
 
 		for (int i = 0; i < mapSubSectors.length; ++i) {
@@ -197,7 +197,7 @@ bool loadStandardNodes(Map *map, LumpNum lumpNum)
 		mapNodes.data = (MapNode*)nodesLookup.lump.data;
 		mapNodes.length = nodesLookup.lump.length / sizeof(MapNode);
 
-		map->nodes.data = (Node*)memoryAlloc(level, sizeof(Node) * mapNodes.length);
+		map->nodes.data = arenaAlloc<Node>(level, mapNodes.length);
 		map->nodes.length = mapNodes.length;
 
 		for (int i = 0; i < mapNodes.length; ++i) {
@@ -407,7 +407,7 @@ bool loadZNodes(Map *map, LumpNum lumpNum)
 			newVertArray = map->vertexes.data;
 		} else {
 			// Use tag (here and elsewhere)
-			newVertArray = (Vertex*)memoryAlloc(level, sizeof(Vertex) * orgVerts + newVerts);
+			newVertArray = arenaAlloc<Vertex>(level, orgVerts + newVerts);
 			memcpy(newVertArray, map->vertexes.data, orgVerts * sizeof(Vertex));
 		}
 
@@ -444,7 +444,7 @@ bool loadZNodes(Map *map, LumpNum lumpNum)
 		}
 
 		checkZNodesOverflow(len, numSubs * sizeof(u32));
-		map->subsectors.data = (SubSector*)memoryAlloc(level, sizeof(SubSector) * map->subsectors.length);
+		map->subsectors.data = arenaAlloc<SubSector>(level, map->subsectors.length);
 		for(u32 i = currSeg = 0; i < numSubs; i++)
 		{
 			map->subsectors.data[i].firstseg = (i32)currSeg;
@@ -477,7 +477,7 @@ bool loadZNodes(Map *map, LumpNum lumpNum)
 		// }
 
 		checkZNodesOverflow(len, totalSegSize);
-		map->segs.data = (Seg*)memoryAlloc(level, sizeof(Seg) * map->segs.length);
+		map->segs.data = arenaAlloc<Seg>(level, map->segs.length);
 		loadZSegs(map, data); // FIXME
 
 		data += totalSegSize;
@@ -492,7 +492,7 @@ bool loadZNodes(Map *map, LumpNum lumpNum)
 
 		map->nodes.length = (usize)numNodes;
 		checkZNodesOverflow(len, numNodes * 32);
-		map->nodes.data = (Node*)memoryAlloc(level, sizeof(Node) * map->nodes.length);
+		map->nodes.data = arenaAlloc<Node>(level, map->nodes.length);
 
 		for (u32 i = 0; i < numNodes; i++) {
 			Node* node = map->nodes.data + i;
@@ -571,7 +571,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 
 	result.result = MapResult::InvalidMap;
 
-	auto map = (Map*)memoryAlloc(level, sizeof(Map));
+	auto map = arenaAlloc<Map>(level);
 
 	logMessage("Loading map %.8s...", mapMarker.name);
 
@@ -584,7 +584,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 		mapSectors.data = (MapSector*)sectors.lump.data;
 		mapSectors.length = sectors.lump.length / sizeof(MapSector);
 
-		map->sectors.data = (Sector*)memoryAlloc(level, sizeof(Sector) * mapSectors.length);
+		map->sectors.data = arenaAlloc<Sector>(level, mapSectors.length);
 		map->sectors.length = mapSectors.length;
 
 		for (int i = 0; i < mapSectors.length; ++i) {
@@ -611,7 +611,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 		mapVertexes.data = (MapVertex*)vertexesLookup.lump.data;
 		mapVertexes.length = vertexesLookup.lump.length / sizeof(MapVertex);
 
-		map->vertexes.data = (Vertex*)memoryAlloc(level, sizeof(Vertex) * mapVertexes.length);
+		map->vertexes.data = arenaAlloc<Vertex>(level, mapVertexes.length);
 		map->vertexes.length = mapVertexes.length;
 
 		for (int i = 0; i < mapVertexes.length; ++i) {
@@ -634,7 +634,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 		mapSides.data = (MapSideDef*)sidesLookup.lump.data;
 		mapSides.length = sidesLookup.lump.length / sizeof(MapSideDef);
 
-		map->sides.data = (SideDef*)memoryAlloc(level, sizeof(SideDef) * mapSides.length);
+		map->sides.data = arenaAlloc<SideDef>(level, mapSides.length);
 		map->sides.length = mapSides.length;
 
 		for (int i = 0; i < mapSides.length; ++i) {
@@ -662,7 +662,7 @@ MapLoad loadMap(LumpNum lumpNum) {
 		mapLines.data = (MapLine*)linesLookup.lump.data;
 		mapLines.length = linesLookup.lump.length / sizeof(MapLine);
 
-		map->lines.data = (LineDef*)memoryAlloc(level, sizeof(LineDef) * mapLines.length);
+		map->lines.data = arenaAlloc<LineDef>(level, mapLines.length);
 		map->lines.length = mapLines.length;
 
 		for (int i = 0; i < mapLines.length; ++i) {
